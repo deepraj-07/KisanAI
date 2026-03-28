@@ -262,8 +262,8 @@ firestore-root/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/deepraj-07/kisan-ai.git
-cd kisan-ai
+git clone https://github.com/deepraj-07/Kisan-AI.git
+cd Kisan-AI
 ```
 
 ### 2. Install dependencies
