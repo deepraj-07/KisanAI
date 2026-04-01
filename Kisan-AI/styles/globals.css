@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #0f0f0f;
+  --color-bg-surface: #1a1a1a;
+  --color-bg-elevated: #242424;
+  --color-bg-hover: #2d2621;
+  --color-border: #3a332c;
+  --color-border-muted: #2e2924;
+
+  --color-primary: #e86b2e;
+  --color-secondary: #2d5016;
+  --color-accent: #f4c430;
+
+  --color-text-primary: #f5f0e8;
+  --color-text-secondary: #b8a99a;
+  --color-text-muted: #9f9386;
+
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  --color-danger: #f44336;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-image: linear-gradient(to bottom right, #0f0f0f, #1a1a1a, #121212);
+  background-attachment: fixed;
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+  @apply font-semibold tracking-wide text-[color:var(--color-text-primary)];
+}
+
+p,
+span,
+label,
+input,
+textarea,
+button {
+  @apply text-[color:var(--color-text-secondary)];
+}
+
+@layer components {
+  .card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl p-5;
+  }
+
+  .card-interactive {
+    @apply card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#E86B2E]/20;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium;
+    @apply bg-gradient-to-r from-[#E86B2E] to-[#F4C430] text-[#0F0F0F];
+    @apply transition-all duration-300 hover:scale-105 hover:brightness-110 active:scale-95;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium;
+    @apply bg-white/5 border border-white/10 text-[#B8A99A] transition-all duration-300;
+    @apply hover:bg-white/10 hover:text-[#F5F0E8] hover:border-[#E86B2E]/30;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2.5 rounded-lg text-sm;
+    @apply bg-[#0f0f0f] border border-[#3a332c] text-[#F5F0E8] placeholder:text-[#9f9386];
+    @apply outline-none transition-all duration-300 focus:border-[#E86B2E] focus:ring-1 focus:ring-[#E86B2E]/30;
+  }
+}

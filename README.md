@@ -42,6 +42,9 @@ Kisan AI is a full-stack progressive web app that combines:
 
 ## ✨ Features
 
+### 🧭 Khet Overview Dashboard
+The dashboard is now organized around farmer-first widgets with bilingual labels: Mitti Ka Hal, Aaj Ka Bhav, Mausam Alert, and Fasal Score, plus Aaj Ki Salah and Khet Diary summaries.
+
 ### 🤖 Multilingual AI Chat
 Farmers can chat in their native language. Every single AI response is grounded with live data — current temperature, soil moisture from the field, today's mandi rates, and the farmer's own crop profile. Nothing generic. Everything local.
 
@@ -76,6 +79,11 @@ PM-KISAN, Fasal Bima Yojana, Kisan Credit Card, Soil Health Card — with deadli
 - **Speak to the AI** — mic button with real-time Hindi/regional language transcription
 - **AI speaks back** — every response has a Listen button with native language TTS
 - Built entirely on Web Speech API — zero extra cost, works in Chrome
+
+### 🧮 Khet Score
+- Overall farm health score (0-100)
+- Breakdown by Soil, Weather, Activity, and Market
+- Actionable AI recommendations for improvement
 
 ---
 
@@ -121,9 +129,9 @@ PM-KISAN, Fasal Bima Yojana, Kisan Credit Card, Soil Health Card — with deadli
                   │
 ┌─────────────────▼────────────────────────────┐
 │           Next.js API Routes                 │
-│  /api/gemini  → Gemini AI (chat + vision)   │
-│  /api/weather → Open-Meteo (weather+soil)   │
-│  /api/market  → Mandi prices + MSP          │
+│  /api/ai      → Gemini AI (chat + vision)   │
+│  /api/forecast→ Open-Meteo (weather+soil)   │
+│  /api/mandi   → Mandi prices + MSP          │
 │  /api/advisory→ Unified AI advisory route   │
 └──────────┬───────────────────┬───────────────┘
            │                   │
@@ -133,6 +141,48 @@ PM-KISAN, Fasal Bima Yojana, Kisan Credit Card, Soil Health Card — with deadli
 │  · Vision       │  │  · Firestore DB         │
 │  · Crop Advisor │  │  · User Profiles        │
 └─────────────────┘  └────────────────────────┘
+```
+
+## 📁 Folder Structure
+
+```text
+kisanai/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   └── onboarding/
+│   ├── (dashboard)/
+│   │   ├── home/
+│   │   ├── advisor/
+│   │   ├── diagnose/
+│   │   ├── crops/
+│   │   ├── markets/
+│   │   ├── forecast/
+│   │   ├── yojana/
+│   │   ├── khet-diary/
+│   │   ├── khet-score/
+│   │   ├── profile/
+│   │   └── settings/
+│   └── api/
+│       ├── ai/
+│       ├── advisory/
+│       ├── forecast/
+│       └── mandi/
+├── components/
+│   ├── advisor/
+│   ├── diagnose/
+│   ├── layout/
+│   ├── ui/
+│   └── shared/
+├── core/
+├── hooks/
+├── services/
+├── config/
+├── constants/
+├── utils/
+├── styles/
+├── models/
+└── assets/
 ```
 
 ---
