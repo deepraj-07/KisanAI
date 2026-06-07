@@ -180,7 +180,13 @@ const handleGoogle = async () => {
           </div>
 
           {/* Google */}
-          <button type="button" onClick={handleGoogle} disabled={busy}
+          <button
+  type="button"
+  onClick={() => {
+    console.log("BUTTON CLICKED");
+    handleGoogle();
+  }}
+  disabled={busy}
             className="w-full flex items-center justify-center gap-3 py-2.5 rounded-lg border border-[#3B322A] text-sm font-medium text-[#B8A99A] hover:border-[#5A4636] hover:text-white hover:bg-white/5 transition-all disabled:opacity-50">
             {/* Google icon SVG */}
             <svg className="w-4 h-4" viewBox="0 0 24 24">
