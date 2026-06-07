@@ -67,18 +67,28 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogle = async () => {
-    setError(null);
-    setBusy(true);
-    try {
-      await signInWithGoogle();
-      router.replace("/home");
-    } catch (err: unknown) {
-      setError(normalizeAuthError(err));
-    } finally {
-      setBusy(false);
-    }
-  };
+const handleGoogle = async () => {
+  console.log("Google button clicked");
+
+  setError(null);
+  setBusy(true);
+
+  try {
+    console.log("Calling signInWithGoogle");
+
+    await signInWithGoogle();
+
+    console.log("Google login success");
+
+    router.replace("/home");
+  } catch (err: unknown) {
+    console.error("Google login failed:", err);
+
+    setError(normalizeAuthError(err));
+  } finally {
+    setBusy(false);
+  }
+};
 
   if (loading) {
     return (

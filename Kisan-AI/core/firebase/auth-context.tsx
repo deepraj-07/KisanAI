@@ -67,19 +67,29 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
     await createUserWithEmailAndPassword(auth, normalizedEmail, password);
   };
 
-  const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    provider.addScope("email");
-    provider.addScope("profile");
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (err) {
-      if (err instanceof FirebaseError && err.code === "auth/popup-closed-by-user") {
-        throw new Error("Google sign-in popup was closed. Please try again.");
-      }
-      throw err;
+const signInWithGoogle = async () => {
+  console.log("Creating provider");
+
+  const provider = new GoogleAuthProvider();
+  provider.addScope("email");
+  provider.addScope("profile");
+
+  try {
+    console.log("Opening popup");
+
+    await signInWithPopup(auth, provider);
+
+    console.log("Popup success");
+  } catch (err) {
+    console.error("Popup error:", err);
+
+    if (err instanceof FirebaseError && err.code === "auth/popup-closed-by-user") {
+      throw new Error("Google sign-in popup was closed. Please try again.");
     }
-  };
+
+    throw err;
+  }
+};
 
   const signOut = async () => {
     await firebaseSignOut(auth);
