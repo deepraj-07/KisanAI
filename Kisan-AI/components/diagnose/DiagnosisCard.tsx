@@ -46,24 +46,37 @@ function SeverityDot({ severity }: { severity: PestDiagnosisResult["severity"] }
 
 // Confidence bar
 
-function ConfidenceBar({ value }: { value: number }) {
-  const color =
-    value >= 80 ? "bg-[#E86B2E]" :
-    value >= 60 ? "bg-amber-400" : "bg-rose-400";
+function ConfidenceRing({ value }: { value: number }) {
+  const radius = 28;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.max(0, Math.min(100, value));
+  const offset = circumference - (progress / 100) * circumference;
+  const tone = progress >= 80 ? "text-green-300" : progress >= 50 ? "text-yellow-300" : "text-rose-300";
+  const bharosaText = progress >= 80 ? "Achha bharosa" : progress >= 50 ? "Theek-thaak bharosa" : "Kam bharosa";
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-[#B8A99A]">
-          Confidence Score
-        </span>
-        <span className="text-sm font-bold text-white">{value}%</span>
-      </div>
-      <div className="h-1.5 w-full rounded-full bg-[#3B322A] overflow-hidden">
-        <div
-          className={cn("h-full rounded-full transition-all duration-700", color)}
-          style={{ width: `${value}%` }}
+    <div className="flex items-center gap-4">
+      <svg width="74" height="74" viewBox="0 0 74 74" className="flex-shrink-0">
+        <circle cx="37" cy="37" r={radius} stroke="#3B322A" strokeWidth="8" fill="none" />
+        <circle
+          cx="37"
+          cy="37"
+          r={radius}
+          stroke="#E86B2E"
+          strokeWidth="8"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          transform="rotate(-90 37 37)"
         />
+        <text x="37" y="40" textAnchor="middle" className="fill-white text-[14px] font-bold">
+          {progress}%
+        </text>
+      </svg>
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#B8A99A]">Vishwas Score</p>
+        <p className={`text-sm font-semibold ${tone}`}>{progress}% sure - {bharosaText}</p>
       </div>
     </div>
   );
@@ -106,7 +119,7 @@ export default function DiagnosisCard({ result }: DiagnosisCardProps) {
 
         {/* Confidence bar */}
         {!isUnknown && (
-          <ConfidenceBar value={result.confidencePercent} />
+          <ConfidenceRing value={result.confidencePercent} />
         )}
 
         {/* Affected area */}

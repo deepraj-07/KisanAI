@@ -100,11 +100,11 @@ export default function DashboardPage() {
 
   const wheatPrice = prices.find((p: import('@/models').MarketPrice) => p.cropName === "Wheat");
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "\u0928\u092E\u0938\u094D\u0924\u0947" : hour < 17 ? "\u0928\u092E\u0938\u094D\u0924\u0947" : "\u0928\u092E\u0938\u094D\u0924\u0947";
+  const greeting = hour < 12 ? "नमस्ते" : hour < 17 ? "नमस्ते" : "नमस्ते";
   const quotes = [
-    "\u092C\u0940\u091C \u092C\u094B\u0928\u0947 \u0915\u093E \u0938\u0939\u0940 \u0938\u092E\u092F \u0939\u0940 \u092B\u0938\u0932 \u0915\u0940 \u0924\u093E\u0915\u0924 \u0924\u092F \u0915\u0930\u0924\u093E \u0939\u0948\u0964",
+    "बीज बोने का सही समय ही फसल की ताकत तय करता है।",
     "Healthy soil today means better yield tomorrow.",
-    "\u0938\u0939\u0940 \u091C\u093E\u0928\u0915\u093E\u0930\u0940, \u0938\u0939\u0940 \u0938\u092E\u092F, \u0938\u0939\u0940 \u0928\u093F\u0930\u094D\u0923\u092F\u0964",
+    "सही जानकारी, सही समय, सही निर्णय।",
   ];
   const quote = quotes[new Date().getDate() % quotes.length];
   const displayName = user?.displayName?.split(" ")[0] ?? "Farmer";
@@ -128,7 +128,7 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5 mb-3"><MapPin className="w-3.5 h-3.5 text-[#F5F0E8]" strokeWidth={2}/><span className="text-xs font-medium text-[#B8A99A]">{location?.label ?? weather.location} • Today</span></div>
-                  <p className="text-5xl md:text-6xl font-black text-white leading-none mb-1.5 tracking-tight">{weather.temperature}\u00B0C</p>
+                  <p className="text-5xl md:text-6xl font-black text-white leading-none mb-1.5 tracking-tight">{weather.temperature}°C</p>
                   <p className="text-sm text-[#B8A99A] mb-5">{weather.condition}</p>
                   <div className="flex items-center gap-5">
                     <div className="flex items-center gap-1.5 text-sm"><Droplets className="w-4 h-4 text-blue-400" /><span className="text-[#B8A99A]">{weather.humidity}% Humidity</span></div>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
             <p className="text-[10px] text-[#B8A99A] uppercase tracking-wider mt-2 mb-1">Current Market Price</p>
             {loadingP ? <div className="shimmer h-7 w-24 rounded" /> : (
               <>
-                <p className="text-2xl font-bold text-white">\u20B9{wheatPrice?.currentPrice?.toLocaleString("en-IN") ?? "--"}/q</p>
+                <p className="text-2xl font-bold text-white">₹{wheatPrice?.currentPrice?.toLocaleString("en-IN") ?? "--"}/q</p>
                 <p className={cn("text-xs mt-1 flex items-center gap-1",(wheatPrice?.priceChangePercent ?? 0)>=0?"text-[#F5F0E8]":"text-rose-400")}>
                   <TrendingUp className="w-3 h-3" />{(wheatPrice?.priceChangePercent ?? 0).toFixed(1)}% vs MSP
                 </p>

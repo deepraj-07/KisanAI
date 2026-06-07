@@ -40,24 +40,24 @@ type SchemeLang = "en" | "hi";
 
 const SCHEME_I18N: Record<string, { nameHi: string; descriptionHi: string; eligibilityHi: string[] }> = {
   "pm-kisan": {
-    nameHi: "\u092A\u0940\u090F\u092E-\u0915\u093F\u0938\u093E\u0928",
-    descriptionHi: "\u092D\u0942\u092E\u093F\u0927\u093E\u0930\u0915 \u0915\u093F\u0938\u093E\u0928 \u092A\u0930\u093F\u0935\u093E\u0930\u094B\u0902 \u0915\u094B \u092A\u094D\u0930\u0924\u093F \u0935\u0930\u094D\u0937 \u20B96,000 \u0915\u0940 \u092A\u094D\u0930\u0924\u094D\u092F\u0915\u094D\u0937 \u0906\u092F \u0938\u0939\u093E\u092F\u0924\u093E\u0964",
-    eligibilityHi: ["\u091B\u094B\u091F\u0947 \u0914\u0930 \u0938\u0940\u092E\u093E\u0902\u0924 \u0915\u093F\u0938\u093E\u0928", "\u092D\u0942\u092E\u093F \u0938\u094D\u0935\u093E\u092E\u093F\u0924\u094D\u0935 \u0906\u0935\u0936\u094D\u092F\u0915", "\u092C\u0948\u0902\u0915 \u0916\u093E\u0924\u093E \u0914\u0930 \u0906\u0927\u093E\u0930 \u0906\u0935\u0936\u094D\u092F\u0915"],
+    nameHi: "पीएम-किसान",
+    descriptionHi: "भूमिधारक किसान परिवारों को प्रति वर्ष ₹6,000 की प्रत्यक्ष आय सहायता।",
+    eligibilityHi: ["छोटे और सीमांत किसान", "भूमि स्वामित्व आवश्यक", "बैंक खाता और आधार आवश्यक"],
   },
   "fasal-bima": {
-    nameHi: "\u092A\u094D\u0930\u0927\u093E\u0928\u092E\u0902\u0924\u094D\u0930\u0940 \u092B\u0938\u0932 \u092C\u0940\u092E\u093E \u092F\u094B\u091C\u0928\u093E",
-    descriptionHi: "\u092A\u094D\u0930\u093E\u0915\u0943\u0924\u093F\u0915 \u0906\u092A\u0926\u093E \u0938\u0947 \u092B\u0938\u0932 \u0928\u0941\u0915\u0938\u093E\u0928 \u092A\u0930 \u0915\u093F\u0938\u093E\u0928\u094B\u0902 \u0915\u0940 \u0935\u093F\u0924\u094D\u0924\u0940\u092F \u0938\u0941\u0930\u0915\u094D\u0937\u093E \u0915\u0947 \u0932\u093F\u090F \u092C\u0940\u092E\u093E \u092F\u094B\u091C\u0928\u093E\u0964",
-    eligibilityHi: ["\u0938\u0942\u091A\u093F\u0924 \u092B\u0938\u0932 \u0909\u0917\u093E\u0928\u0947 \u0935\u093E\u0932\u0947 \u0915\u093F\u0938\u093E\u0928", "\u090B\u0923\u0940 \u0915\u093F\u0938\u093E\u0928 \u0938\u094D\u0935\u0924\u0903 \u0915\u0935\u0930"],
+    nameHi: "प्रधानमंत्री फसल बीमा योजना",
+    descriptionHi: "प्राकृतिक आपदा से फसल नुकसान पर किसानों की वित्तीय सुरक्षा के लिए बीमा योजना।",
+    eligibilityHi: ["सूचित फसल उगाने वाले किसान", "ऋणी किसान स्वतः कवर"],
   },
   "kcc": {
-    nameHi: "\u0915\u093F\u0938\u093E\u0928 \u0915\u094D\u0930\u0947\u0921\u093F\u091F \u0915\u093E\u0930\u094D\u0921 (KCC)",
-    descriptionHi: "\u0916\u0947\u0924\u0940, \u0915\u091F\u093E\u0908 \u092C\u093E\u0926 \u0916\u0930\u094D\u091A \u0914\u0930 \u0938\u0902\u092C\u0902\u0927\u093F\u0924 \u0917\u0924\u093F\u0935\u093F\u0927\u093F\u092F\u094B\u0902 \u0915\u0947 \u0932\u093F\u090F \u0905\u0932\u094D\u092A\u0915\u093E\u0932\u093F\u0915 \u090B\u0923 \u0938\u0941\u0935\u093F\u0927\u093E\u0964",
-    eligibilityHi: ["\u0938\u092D\u0940 \u0915\u093F\u0938\u093E\u0928", "\u090F\u0938\u090F\u091A\u091C\u0940 \u0914\u0930 \u092C\u091F\u093E\u0908\u0926\u093E\u0930 \u0915\u093F\u0938\u093E\u0928"],
+    nameHi: "किसान क्रेडिट कार्ड (KCC)",
+    descriptionHi: "खेती, कटाई बाद खर्च और संबंधित गतिविधियों के लिए अल्पकालिक ऋण सुविधा।",
+    eligibilityHi: ["सभी किसान", "एससीजी और बटाईदार किसान"],
   },
   "soil-health-card": {
-    nameHi: "\u092E\u0943\u0926\u093E \u0938\u094D\u0935\u093E\u0938\u094D\u0925\u094D\u092F \u0915\u093E\u0930\u094D\u0921 \u092F\u094B\u091C\u0928\u093E",
-    descriptionHi: "\u0939\u0930 2 \u0935\u0930\u094D\u0937 \u092E\u0947\u0902 \u0928\u093F\u0903\u0936\u0941\u0932\u094D\u0915 \u092E\u093F\u091F\u094D\u091F\u0940 \u092A\u0930\u0940\u0915\u094D\u0937\u0923 \u0914\u0930 \u092A\u094B\u0937\u0915 \u0924\u0924\u094D\u0935 \u0906\u0927\u093E\u0930\u093F\u0924 \u0938\u0941\u091D\u093E\u0935\u0964",
-    eligibilityHi: ["\u0938\u092D\u0940 \u0915\u093F\u0938\u093E\u0928", "\u0928\u093F\u0915\u091F\u0924\u092E \u0915\u0943\u0937\u093F \u0935\u093F\u091C\u094D\u091E\u093E\u0928 \u0915\u0947\u0902\u0926\u094D\u0930 \u092A\u0930 \u0906\u0935\u0947\u0926\u0928 \u0915\u0930\u0947\u0902"],
+    nameHi: "मृदा स्वास्थ्य कार्ड योजना",
+    descriptionHi: "हर 2 वर्ष में निःशुल्क मिट्टी परीक्षण और पोषक तत्व आधारित सुझाव।",
+    eligibilityHi: ["सभी किसान", "निकटतम कृषि विज्ञान केंद्र पर आवेदन करें"],
   },
 };
 
@@ -199,10 +199,10 @@ export default function SchemesPage() {
         {/* Ã¢â€â‚¬Ã¢â€â‚¬ Page header Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-white">{lang === "hi" ? "à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾" : "Sarkari Yojana"}</h1>
+            <h1 className="text-2xl font-bold text-white">{lang === "hi" ? "सरकारी योजना" : "Sarkari Yojana"}</h1>
             <p className="text-sm text-[#B8A99A] mt-1 max-w-xl leading-relaxed">
               {lang === "hi"
-                ? "\u0915\u0943\u0937\u093F \u0935\u093F\u0924\u094D\u0924\u0940\u092F \u0938\u0939\u093E\u092F\u0924\u093E \u0914\u0930 \u0935\u093F\u0915\u093E\u0938 \u092F\u094B\u091C\u0928\u093E\u0913\u0902 \u0915\u0940 \u0938\u0942\u091A\u0940 \u0926\u0947\u0916\u0947\u0902\u0964 \u0906\u092A\u0915\u0940 \u092A\u094D\u0930\u094B\u092B\u093E\u0907\u0932 \u0915\u0947 \u0906\u0927\u093E\u0930 \u092A\u0930 \u0909\u092A\u092F\u0941\u0915\u094D\u0924 \u092F\u094B\u091C\u0928\u093E\u090F\u0902 \u0926\u093F\u0916\u093E\u0908 \u091C\u093E\u0924\u0940 \u0939\u0948\u0902\u0964"
+                ? "कृषि वित्तीय सहायता और विकास योजनाओं की सूची देखें। आपकी प्रोफाइल के आधार पर उपयुक्त योजनाएं दिखाई जाती हैं।"
                 : "Access a curated directory of agricultural financial aid and development programs. We analyse your farm profile to match you with the most relevant schemes."}
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function SchemesPage() {
                 onClick={() => setLang("hi")}
                 className={cn("px-2 py-1 text-xs rounded", lang === "hi" ? "bg-[#E86B2E]/20 text-[#F5F0E8]" : "text-[#B8A99A]")}
               >
-                \u0939\u093F\u0928\u094D\u0926\u0940
+                हिन्दी
               </button>
             </div>
             <button className="btn-secondary text-xs py-2 gap-1.5">
@@ -235,7 +235,7 @@ export default function SchemesPage() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B8A99A]" />
           <input
             type="text"
-            placeholder={lang === "hi" ? "\u092F\u094B\u091C\u0928\u093E, \u0932\u093E\u092D \u092F\u093E \u092A\u093E\u0924\u094D\u0930\u0924\u093E \u0916\u094B\u091C\u0947\u0902..." : "Search schemes, benefits, or eligibility..."}
+            placeholder={lang === "hi" ? "योजना, लाभ या पात्रता खोजें..." : "Search schemes, benefits, or eligibility..."}
             value={search}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
             className="input-field pl-10 text-sm"
@@ -256,13 +256,13 @@ export default function SchemesPage() {
               <h2 className="text-lg font-bold text-white mt-1 leading-snug">
                 {lang === "hi" ? (
                   <>
-                    \u0906\u092A <span className="text-[#F5F0E8]">12 \u092F\u094B\u091C\u0928\u093E\u0913\u0902</span> \u0915\u0947 \u0932\u093F\u090F \u092A\u093E\u0924\u094D\u0930 \u0939\u0948\u0902, \u0932\u0917\u092D\u0917{" "}
-                    <span className="text-[#F5F0E8]">\u20B945,000</span> \u0932\u093E\u092D \u0924\u0915\u0964
+                    आप <span className="text-[#F5F0E8]">12 योजनाओं</span> के लिए पात्र हैं, लगभग{" "}
+                    <span className="text-[#F5F0E8]">₹45,000</span> लाभ तक।
                   </>
                 ) : (
                   <>
                     You are eligible for <span className="text-[#F5F0E8]">12 schemes</span> worth approx.{" "}
-                    <span className="text-[#F5F0E8]">\u20B945,000</span> in benefits.
+                    <span className="text-[#F5F0E8]">₹45,000</span> in benefits.
                   </>
                 )}
               </h2>
@@ -350,7 +350,7 @@ export default function SchemesPage() {
                 </button>
               ))}
               <span className="text-xs text-[#3d4d3e]">
-                \u00A9 2026 Kisan AI. Official Agritech Partner.
+                © 2026 Kisan AI. Official Agritech Partner.
               </span>
             </div>
           </div>

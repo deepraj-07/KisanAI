@@ -61,7 +61,8 @@ export interface FirestoreUser {
   };
   landHolding: number;            // Acres
   primaryCrops: string[];         // e.g. ["wheat", "rice"]
-  preferredLanguage: "en" | "hi" | "pa" | "mr" | "te" | "ta";
+  preferredLanguage: "en" | "hi" | "pa" | "mr" | "te" | "ta" | "gu" | "kn" | "ml" | "ur" | "bn" | "or" | "as" | "sd" | "en_US";
+  ttsSpeed: "slow" | "normal" | "fast";
 
   // Metadata
   createdAt: Timestamp;
@@ -166,6 +167,24 @@ export interface CropRecommendation {
   soilCompatibility: string;
   reasonsForRecommendation: string[];
   risks: string[];
+}
+
+export interface FirestoreCropListing {
+  id: string;
+  cropName: string;
+  quantity: number;
+  quantityUnit: "kg" | "quintal";
+  photos: string[];
+  thresholdPrice: number;
+  location: {
+    state: string;
+    district: string;
+    villageOrTown: string;
+  };
+  contactNumber: string;
+  userId: string;
+  createdAt: Timestamp;
+  status: "active" | "sold" | "inactive";
 }
 
 /**

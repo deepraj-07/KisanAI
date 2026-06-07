@@ -9,7 +9,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Bell, Search, LogOut } from "lucide-react";
+import { Bell, Search, LogOut, X } from "lucide-react";
 import { useAuth } from "@/core/firebase/auth-context";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/auth/AuthGuard";
@@ -26,7 +26,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/yojana":    { title: "Sarkari Yojana", subtitle: "Subsidy aur scheme deadlines" },
   "/profile":   { title: "Mera Profile", subtitle: "Farm details aur language preferences" },
   "/khet-diary":{ title: "Khet Diary", subtitle: "Rozana farm activity record" },
-  "/settings":  { title: "Vyavastha", subtitle: "App controls aur notifications" },
+  "/team":      { title: "Hamaari Team", subtitle: "Kisan AI banane wale log" },
   "/khet-score":{ title: "Khet Score", subtitle: "Overall farm health index" },
 };
 
@@ -36,6 +36,10 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [appNotifications, setAppNotifications] = useState(true);
+  const [whatsappAlerts, setWhatsappAlerts] = useState(false);
+  const [smsAlerts, setSmsAlerts] = useState(true);
   const pathname  = usePathname();
   const { user, signOut } = useAuth();
   const router    = useRouter();
@@ -56,6 +60,30 @@ export default function AppShell({ children }: AppShellProps) {
     : user?.email?.[0]?.toUpperCase() ?? "U";
 
   const displayName = user?.displayName ?? user?.email?.split("@")[0] ?? "Farmer";
+
+  React.useEffect(() => {
+    const appVal = localStorage.getItem("top-notif-app");
+    const waVal = localStorage.getItem("top-notif-whatsapp");
+    const smsVal = localStorage.getItem("top-notif-sms");
+    if (appVal !== null) setAppNotifications(appVal === "true");
+    if (waVal !== null) setWhatsappAlerts(waVal === "true");
+    if (smsVal !== null) setSmsAlerts(smsVal === "true");
+  }, []);
+
+  const setToggle = (key: "app" | "whatsapp" | "sms", value: boolean) => {
+    if (key === "app") {
+      setAppNotifications(value);
+      localStorage.setItem("top-notif-app", String(value));
+      return;
+    }
+    if (key === "whatsapp") {
+      setWhatsappAlerts(value);
+      localStorage.setItem("top-notif-whatsapp", String(value));
+      return;
+    }
+    setSmsAlerts(value);
+    localStorage.setItem("top-notif-sms", String(value));
+  };
 
   return (
     <AuthGuard>
@@ -82,7 +110,10 @@ export default function AppShell({ children }: AppShellProps) {
               <button className="p-2 rounded-lg text-[#B8A99A] hover:text-[#F5F0E8] hover:bg-white/5 transition-colors">
                 <Search className="w-4 h-4" />
               </button>
-              <button className="relative p-2 rounded-lg text-[#B8A99A] hover:text-[#F5F0E8] hover:bg-white/5 transition-colors">
+              <button
+                onClick={() => setShowNotificationModal(true)}
+                className="relative p-2 rounded-lg text-[#B8A99A] hover:text-[#F5F0E8] hover:bg-white/5 transition-colors"
+              >
                 <Bell className="w-4 h-4" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#F4C430] border-2 border-[#0F0F0F]" />
               </button>
@@ -116,6 +147,48 @@ export default function AppShell({ children }: AppShellProps) {
             {children ?? null}
           </main>
         </div>
+
+        {showNotificationModal && (
+          <div className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-sm rounded-xl bg-[#1A1A1A] border border-[#3B322A] p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-semibold text-white">Notifications</h3>
+                <button
+                  onClick={() => setShowNotificationModal(false)}
+                  className="text-[#B8A99A] hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  { label: "App Notifications", value: appNotifications, key: "app" as const },
+                  { label: "WhatsApp Alerts", value: whatsappAlerts, key: "whatsapp" as const },
+                  { label: "SMS Alerts", value: smsAlerts, key: "sms" as const },
+                ].map((item) => (
+                  <div key={item.key} className="rounded-lg bg-[#242424] border border-[#3B322A] px-3 py-2.5 flex items-center justify-between">
+                    <span className="text-sm text-white">{item.label}</span>
+                    <button
+                      onClick={() => setToggle(item.key, !item.value)}
+                      className={cn(
+                        "relative w-10 h-6 rounded-full transition-colors",
+                        item.value ? "bg-[#E86B2E]" : "bg-[#3B322A]"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "absolute top-1 w-4 h-4 rounded-full bg-white transition-transform",
+                          item.value ? "translate-x-5" : "translate-x-1"
+                        )}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AuthGuard>
   );

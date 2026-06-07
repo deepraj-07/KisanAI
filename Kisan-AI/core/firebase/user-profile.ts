@@ -30,6 +30,7 @@ export async function createUserProfileIfNotExists(user: User): Promise<void> {
     landHolding:       0,
     primaryCrops:      [],
     preferredLanguage: "en",
+    ttsSpeed:          "normal",
     createdAt:         serverTimestamp(),
     updatedAt:         serverTimestamp(),
     lastLoginAt:       serverTimestamp(),

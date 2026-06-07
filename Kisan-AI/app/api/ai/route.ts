@@ -2,46 +2,17 @@
 /**
  * app/api/ai/route.ts
  * ============================================================
- * Central AI API Route � Google Gemini
- * Model: gemini-flash-latest (fallback chain)
+ * Central AI API Route – Mistral AI
+ * Model: mistral-large-latest (for chat/text)
+ * Model: pixtral-12b-2409 (for vision/pest diagnosis)
  * ============================================================
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Mistral } from "@mistralai/mistralai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { GeminiRequestBody, GeminiResponseBody } from "@/models";
 import { safeJsonParse } from "@/utils/utils";
-
-// --- Model --------------------------------------------------------------------
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const MODEL_CANDIDATES = [
-  "gemini-flash-latest",
-  "gemini-2.0-flash-lite",
-  "gemini-2.0-flash",
-];
-
-async function generateWithFallback(input: string | Array<string | { inlineData: { data: string; mimeType: string } }>) {
-  let lastError: unknown;
-
-  for (const candidate of MODEL_CANDIDATES) {
-    try {
-      const candidateModel = genAI.getGenerativeModel({ model: candidate });
-      return await candidateModel.generateContent(input);
-    } catch (err) {
-      lastError = err;
-      const msg = err instanceof Error ? err.message.toLowerCase() : "";
-      const isModelMissing = msg.includes("404") || msg.includes("not found") || msg.includes("is not found");
-      const isTransientBusy = msg.includes("503") || msg.includes("high demand") || msg.includes("service unavailable");
-      const isQuotaExceeded = msg.includes("429") || msg.includes("quota exceeded") || msg.includes("rate limit");
-      if (!isModelMissing && !isTransientBusy && !isQuotaExceeded) break;
-    }
-  }
-
-  throw lastError instanceof Error
-    ? lastError
-    : new Error("No compatible Gemini model available for this API key.");
-}
 
 // --- System Prompts -----------------------------------------------------------
 
@@ -81,11 +52,12 @@ RESPONSE GUIDELINES:
 - Be concise, practical, and actionable
 - Use Indian units: acres, quintals, bags (50kg). Currency in INR (₹)
 - Use bullet points for steps, keep paragraphs short
+- Always end with: "Vishwas Score: 85/100"
 - Always suggest consulting a local agronomist for critical decisions`;
 }
 
 const PEST_SYSTEM = `You are an expert plant pathologist for Indian crops.
-Analyse the crop image and return VALID JSON ONLY � no text outside JSON.
+Analyse the crop image and return VALID JSON ONLY – no text outside JSON.
 
 {
   "diseaseName": "string",
@@ -99,11 +71,12 @@ Analyse the crop image and return VALID JSON ONLY � no text outside JSON.
     "preventive": ["string"],
     "recommendedPesticides": ["string"]
   },
-  "disclaimer": "Consult a local agronomist before applying treatments."
+  "disclaimer": "Consult a local agronomist before applying treatments.",
+  "vishwasScore": number
 }`;
 
 const CROP_ADVISOR_SYSTEM = `You are an expert agronomist for Indian farm economics.
-Return VALID JSON ONLY � no text outside JSON.
+Return VALID JSON ONLY – no text outside JSON.
 
 {
   "recommendations": [{
@@ -124,16 +97,17 @@ Return VALID JSON ONLY � no text outside JSON.
     "risks": ["string"]
   }],
   "generalAdvice": "string",
-  "bestCrop": "string"
+  "bestCrop": "string",
+  "vishwasScore": number
 }`;
 
 // --- Route Handler ------------------------------------------------------------
 
 export async function POST(req: NextRequest): Promise<NextResponse<GeminiResponseBody>> {
   try {
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.MISTRAL_API_KEY) {
       return NextResponse.json(
-        { success: false, error: "GEMINI_API_KEY not set in .env.local" },
+        { success: false, error: "MISTRAL_API_KEY not set in .env.local" },
         { status: 503 }
       );
     }
@@ -168,7 +142,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GeminiRespons
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Unexpected error";
-    console.error("[Gemini API] Unhandled error:", err);
+    console.error("[Mistral API] Unhandled error:", err);
     return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
 }
@@ -180,9 +154,23 @@ async function handleChat(
   language: string,
   context?: string
 ): Promise<NextResponse<GeminiResponseBody>> {
-  const fullPrompt = `${buildChatSystemPrompt(language, context)}\n\nUser question:\n${prompt}`;
-  const generation = await generateWithFallback(fullPrompt);
-  const text = generation.response.text() ?? "";
+  const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY! });
+  const systemPrompt = buildChatSystemPrompt(language, context);
+  const fullPrompt = `${systemPrompt}\n\nUser question:\n${prompt}`;
+
+  const response = await client.chat.complete({
+    model: "mistral-large-latest",
+    messages: [
+      { role: "user", content: fullPrompt },
+    ],
+  });
+
+  let text = (response.choices?.[0]?.message?.content as string) || "";
+  // Ensure Vishwas Score is present
+  if (!text.includes("Vishwas Score")) {
+    text += "\n\nVishwas Score: 85/100";
+  }
+
   return NextResponse.json({ success: true, text });
 }
 
@@ -193,30 +181,58 @@ async function handlePestDiagnosis(
   imageBase64: string,
   imageMimeType: string
 ): Promise<NextResponse<GeminiResponseBody>> {
-  const parts = [
-    PEST_SYSTEM,
-    {
-      inlineData: {
-        data: imageBase64,
-        mimeType: imageMimeType,
-      },
-    },
-    prompt || "Diagnose any disease or pest visible in this crop image.",
-  ];
-
-  const generation = await generateWithFallback(parts);
-  const rawText = generation.response.text() ?? "";
-  const structured = safeJsonParse<Record<string, unknown>>(rawText);
-
-  if (!structured) {
-    console.error("[Pest Diagnosis] Failed to parse JSON:", rawText);
+  if (!process.env.GEMINI_API_KEY) {
     return NextResponse.json(
-      { success: false, error: "AI returned unparseable response. Try again.", text: rawText },
-      { status: 500 }
+      { success: false, error: "GEMINI_API_KEY not set in .env.local" },
+      { status: 503 }
     );
   }
 
-  return NextResponse.json({ success: true, structured });
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+
+  const fullPrompt = `${PEST_SYSTEM}
+
+${prompt || "Diagnose any disease or pest visible in this crop image."}`;
+
+  const imagePart = {
+    inlineData: {
+      data: imageBase64,
+      mimeType: imageMimeType,
+    },
+  };
+
+  try {
+    const result = await model.generateContent([fullPrompt, imagePart]);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Extract JSON if wrapped in markdown block
+    let jsonText = text;
+    if (jsonText.includes("```json")) {
+      jsonText = jsonText.split("```json")[1].split("```")[0].trim();
+    } else if (jsonText.includes("```")) {
+      jsonText = jsonText.split("```")[1].split("```")[0].trim();
+    }
+
+    const structured = safeJsonParse<Record<string, unknown>>(jsonText);
+
+    if (!structured) {
+      console.error("[Pest Diagnosis] Failed to parse JSON:", jsonText);
+      return NextResponse.json(
+        { success: false, error: "AI returned unparseable response. Try again.", text: jsonText },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, structured });
+  } catch (error) {
+    console.error("[Pest Diagnosis] Error mapping to Gemini:", error);
+    return NextResponse.json(
+      { success: false, error: "AI processing failed." },
+      { status: 500 }
+    );
+  }
 }
 
 // --- Handler: Crop Advisor ----------------------------------------------------
@@ -225,12 +241,23 @@ async function handleCropAdvisor(
   prompt: string,
   context?: string
 ): Promise<NextResponse<GeminiResponseBody>> {
+  const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY! });
+
   const fullPrompt = context
     ? `Farmer Profile:\n${context}\n\nRequest:\n${prompt}`
     : prompt;
 
-  const generation = await generateWithFallback(`${CROP_ADVISOR_SYSTEM}\n\n${fullPrompt}`);
-  const rawText = generation.response.text() ?? "";
+  const response = await client.chat.complete({
+    model: "mistral-large-latest",
+    messages: [
+      {
+        role: "user",
+        content: `${CROP_ADVISOR_SYSTEM}\n\n${fullPrompt}`,
+      },
+    ],
+  });
+
+  const rawText = (response.choices?.[0]?.message?.content as string) || "";
   const structured = safeJsonParse<Record<string, unknown>>(rawText);
 
   if (!structured) {

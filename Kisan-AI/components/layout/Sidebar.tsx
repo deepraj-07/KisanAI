@@ -25,7 +25,7 @@ import {
   FileText,
   UserCircle,
   BookOpen,
-  Settings2,
+  Users,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -130,10 +130,10 @@ const NAV_ITEMS: NavItem[] = [
     description: "Your farm settings",
   },
   {
-    label: "Vyavastha",
-    href: "/settings",
-    icon: Settings2,
-    description: "Preferences",
+    label: "Hamaari Team",
+    href: "/team",
+    icon: Users,
+    description: "Meet the Kisan AI team",
   },
   {
     label: "Khet Score",
@@ -159,6 +159,10 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
   const { signOut } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [appNotifications, setAppNotifications] = useState(true);
+  const [whatsappAlerts, setWhatsappAlerts] = useState(false);
+  const [smsAlerts, setSmsAlerts] = useState(true);
   const todayHindi = new Date().toLocaleDateString("hi-IN", {
     weekday: "long",
     day: "numeric",
@@ -169,8 +173,31 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
   useEffect(() => {
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") setCollapsed(true);
+
+    const appNotif = localStorage.getItem("notif-app");
+    const whatsapp = localStorage.getItem("notif-whatsapp");
+    const sms = localStorage.getItem("notif-sms");
+    if (appNotif !== null) setAppNotifications(appNotif === "true");
+    if (whatsapp !== null) setWhatsappAlerts(whatsapp === "true");
+    if (sms !== null) setSmsAlerts(sms === "true");
+
     setMounted(true);
   }, []);
+
+  const updateToggle = (key: "app" | "whatsapp" | "sms", value: boolean) => {
+    if (key === "app") {
+      setAppNotifications(value);
+      localStorage.setItem("notif-app", String(value));
+      return;
+    }
+    if (key === "whatsapp") {
+      setWhatsappAlerts(value);
+      localStorage.setItem("notif-whatsapp", String(value));
+      return;
+    }
+    setSmsAlerts(value);
+    localStorage.setItem("notif-sms", String(value));
+  };
 
   const toggleCollapsed = () => {
     const next = !collapsed;
@@ -361,6 +388,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
 
           {/* Notifications shortcut */}
           <button
+            onClick={() => setShowNotificationModal(true)}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm",
               "text-[#B8A99A] hover:text-[#F5F0E8] hover:bg-white/5 transition-colors",
@@ -415,6 +443,48 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
           )}
         </div>
       </aside>
+
+      {showNotificationModal && (
+        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-sm rounded-xl bg-[#1A1A1A] border border-[#3B322A] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-white">Notifications</h3>
+              <button
+                onClick={() => setShowNotificationModal(false)}
+                className="p-1 rounded text-[#B8A99A] hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {[
+                { label: "App Notifications", value: appNotifications, key: "app" as const },
+                { label: "WhatsApp Alerts", value: whatsappAlerts, key: "whatsapp" as const },
+                { label: "SMS Alerts", value: smsAlerts, key: "sms" as const },
+              ].map((item) => (
+                <div key={item.key} className="flex items-center justify-between rounded-lg bg-[#242424] border border-[#3B322A] px-3 py-2.5">
+                  <span className="text-sm text-white">{item.label}</span>
+                  <button
+                    onClick={() => updateToggle(item.key, !item.value)}
+                    className={cn(
+                      "relative w-10 h-6 rounded-full transition-colors",
+                      item.value ? "bg-[#E86B2E]" : "bg-[#3B322A]"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "absolute top-1 w-4 h-4 rounded-full bg-white transition-transform",
+                        item.value ? "translate-x-5" : "translate-x-1"
+                      )}
+                    />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

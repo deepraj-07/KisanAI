@@ -240,9 +240,7 @@ Open `http://localhost:3000`
 
 | Name | Role | GitHub |
 |---|---|---|
-| Tejas Rastogi (Lead) | Backend + AI Integration | @tejasrastogileet |
-| Deep Raj | Frontend + Firebase | @deepraj-07 |
-| Ayush Shrivastava | Research + Presentation | @AyushShrivastava2808 |
+
 
 ---
 
@@ -267,5 +265,5 @@ Open `http://localhost:3000`
 ---
 
 <div align="center">
-Built with ❤️ for Indian farmers · Stellaris Hackathon 2026
+Built with ❤️ for Indian farmers · Protex: Hack-2-Win
 </div>

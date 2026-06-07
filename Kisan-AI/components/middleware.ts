@@ -15,6 +15,10 @@ const PUBLIC_PATHS = ["/login", "/api/forecast", "/api/mandi", "/api/ai", "/api/
 export function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
 
+  if (pathname === "/settings" || pathname.startsWith("/settings/")) {
+    return NextResponse.redirect(new URL("/profile", req.url));
+  }
+
   // Allow public paths
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();

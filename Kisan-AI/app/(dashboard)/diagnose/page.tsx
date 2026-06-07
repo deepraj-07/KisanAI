@@ -72,6 +72,35 @@ function TreatmentStep({ num, title, body }: { num: string; title: string; body:
   );
 }
 
+function VishwasRing({ value }: { value: number }) {
+  const progress = Math.max(0, Math.min(100, value));
+  const radius = 32;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+  const levelText = progress > 75 ? "Achha bharosa" : progress >= 50 ? "Theek-thaak bharosa" : "Kam bharosa";
+
+  return (
+    <div className="flex items-center gap-4 mt-3">
+      <svg width="84" height="84" viewBox="0 0 84 84">
+        <circle cx="42" cy="42" r={radius} stroke="#3B322A" strokeWidth="8" fill="none" />
+        <circle
+          cx="42"
+          cy="42"
+          r={radius}
+          stroke="#E86B2E"
+          strokeWidth="8"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          transform="rotate(-90 42 42)"
+        />
+        <text x="42" y="46" textAnchor="middle" className="fill-white text-[15px] font-bold">{progress}%</text>
+      </svg>
+      <p className="text-sm text-[#B8A99A]">{progress}% sure - {levelText}</p>
+    </div>
+  );
+}
 // â”€â”€â”€ Page Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function PestDiagnosisPage() {
@@ -466,6 +495,7 @@ export default function PestDiagnosisPage() {
                           style={{ width: `${result.confidencePercent}%` }}
                         />
                       </div>
+                      <VishwasRing value={result.confidencePercent} />
                     </div>
                   </div>
                 </div>

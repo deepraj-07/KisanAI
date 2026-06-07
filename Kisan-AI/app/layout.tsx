@@ -7,6 +7,7 @@ import React from "react";
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Noto_Sans, JetBrains_Mono } from "next/font/google";
 import { AuthProvider } from "@/core/firebase/auth-context";
+import { LanguageProvider } from "@/core/language/context";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import "@/styles/globals.css";
 
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${baloo.variable} ${notoSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased bg-kisan-bg text-kisan-text">
         <AuthProvider>
-          <LoadingScreen>{children}</LoadingScreen>
+          <LanguageProvider>
+            <LoadingScreen>{children}</LoadingScreen>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>

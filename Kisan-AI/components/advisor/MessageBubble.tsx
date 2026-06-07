@@ -1,17 +1,20 @@
 /**
  * components/advisor/MessageBubble.tsx
- * Renders a single chat message â€” user or AI model.
+ * Renders a single chat message - user or AI model.
  * AI messages can embed a DiagnosisCard.
  */
 
 import Image from "next/image";
-import { Wheat } from "lucide-react";
+import { Wheat, Volume2, Square } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/utils/utils";
 import DiagnosisCard from "@/components/diagnose/DiagnosisCard";
 import type { ChatMessage } from "@/app/(dashboard)/advisor/types";
-import { Volume2, Square } from "lucide-react";
+import { useLanguage } from "@/core/language/context";
+import { LANGUAGE_VOICE_MAP, TTS_SPEEDS } from "@/config/languages";
+import type { TTSSpeed } from "@/config/languages";
 
-// â”€â”€â”€ Typing indicator (three animated dots) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Typing indicator (three animated dots) ---
 
 function TypingIndicator() {
   return (
@@ -28,7 +31,7 @@ function TypingIndicator() {
   );
 }
 
-// â”€â”€â”€ Timestamp formatter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Timestamp formatter ---
 
 function formatTime(date: Date): string {
   return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: false });
@@ -38,39 +41,66 @@ function formatTime(date: Date): string {
 
 interface MessageBubbleProps {
   message: ChatMessage;
-  language?: string;
 }
 
-const languageVoiceMap: Record<string, string> = {
-  en: "en-IN",
-  hi: "hi-IN",
-  pa: "pa-IN",
-  mr: "mr-IN",
-  te: "te-IN",
-  ta: "ta-IN",
-};
+function extractVishwasScore(raw: string): { cleaned: string; score: number | null } {
+  const match = raw.match(/vishwas\s*score\s*:\s*(\d{1,3})\s*\/\s*100/i);
+  const score = match ? Math.max(0, Math.min(100, Number(match[1]))) : null;
+  const cleaned = raw
+    .replace(/\n?\s*vishwas\s*score\s*:\s*\d{1,3}\s*\/\s*100\s*/gi, "")
+    .trim();
+  return { cleaned, score };
+}
 
-export default function MessageBubble({ message, language = "en" }: MessageBubbleProps) {
+export default function MessageBubble({ message }: MessageBubbleProps) {
+  const { language, ttsSpeed, setTtsSpeed, t, isSpeaking, setIsSpeaking } = useLanguage();
+  const [speedMenuOpen, setSpeedMenuOpen] = useState(false);
   const isUser = message.role === "user";
+  const parsed = extractVishwasScore(message.content || "");
+
+  const badge =
+    parsed.score === null
+      ? null
+      : parsed.score > 75
+      ? {
+          text: `✓ ${parsed.score}% bharosemand`,
+          classes: "bg-green-900/40 border-green-700/50 text-green-300",
+        }
+      : parsed.score >= 50
+      ? {
+          text: `~ ${parsed.score}% theek hai`,
+          classes: "bg-yellow-900/40 border-yellow-700/50 text-yellow-300",
+        }
+      : {
+          text: `⚠ ${parsed.score}% sure nahi`,
+          classes: "bg-rose-900/40 border-rose-700/50 text-rose-300",
+        };
 
   const speakMessage = () => {
-    if (typeof window === "undefined" || !window.speechSynthesis || !message.content) return;
+    if (typeof window === "undefined" || !window.speechSynthesis || !parsed.cleaned) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(message.content);
-    const targetLang = languageVoiceMap[language] ?? "en-IN";
+    
+    const utterance = new SpeechSynthesisUtterance(parsed.cleaned);
+    const targetLang = LANGUAGE_VOICE_MAP[language as keyof typeof LANGUAGE_VOICE_MAP] ?? "en-IN";
     utterance.lang = targetLang;
 
     const voices = window.speechSynthesis.getVoices();
     const matchingVoice = voices.find((v) => v.lang.toLowerCase().startsWith(targetLang.toLowerCase()));
     if (matchingVoice) utterance.voice = matchingVoice;
-    utterance.rate = 0.95;
+    
+    utterance.rate = TTS_SPEEDS[ttsSpeed].value;
     utterance.pitch = 1;
+    
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    
     window.speechSynthesis.speak(utterance);
   };
 
   const stopSpeaking = () => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
+    setIsSpeaking(false);
   };
 
   // â”€â”€ User message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -121,37 +151,68 @@ export default function MessageBubble({ message, language = "en" }: MessageBubbl
             {/* Text bubble */}
             {message.content && (
               <div className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%]">
-                <p className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
-                <div className="mt-2">
-                  <div className="flex items-center justify-between text-[10px] text-[#B8A99A] mb-1">
-                    <span>Confidence</span>
-                    <span className="text-[#F5F0E8] font-medium">Medium</span>
+                <p className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words">{parsed.cleaned}</p>
+                {badge && (
+                  <div className="mt-2">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-[10px] border ${badge.classes}`}>
+                      {badge.text}
+                    </span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-[#2B241F] overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-[#E86B2E] to-[#F4C430]" style={{ width: "68%" }} />
-                  </div>
-                </div>
+                )}
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <span className="px-2 py-0.5 rounded-full text-[10px] border border-[#3B322A] bg-[#2B241F] text-[#B8A99A]">Based on: Live Weather</span>
                   <span className="px-2 py-0.5 rounded-full text-[10px] border border-[#3B322A] bg-[#2B241F] text-[#B8A99A]">Mandi Data</span>
                 </div>
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-2 flex flex-wrap items-center gap-2">
                   <button
                     onClick={speakMessage}
-                    className="inline-flex items-center gap-1.5 text-[10px] text-[#B8A99A] hover:text-[#F5F0E8]"
-                    title="Read aloud"
+                    disabled={isSpeaking}
+                    className="inline-flex items-center gap-1.5 text-[10px] text-[#B8A99A] hover:text-[#F5F0E8] disabled:opacity-50 transition-colors"
+                    title={t("chat.listen")}
                   >
                     <Volume2 className="w-3.5 h-3.5" />
-                    Listen
+                    {t("chat.listen")}
                   </button>
                   <button
                     onClick={stopSpeaking}
-                    className="inline-flex items-center gap-1.5 text-[10px] text-[#B8A99A] hover:text-amber-400"
-                    title="Stop audio"
+                    className="inline-flex items-center gap-1.5 text-[10px] text-[#B8A99A] hover:text-amber-400 transition-colors"
+                    title={t("chat.stop")}
                   >
                     <Square className="w-3 h-3" />
-                    Stop
+                    {t("chat.stop")}
                   </button>
+                  
+                  {/* Speed selector */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setSpeedMenuOpen(!speedMenuOpen)}
+                      className="inline-flex items-center gap-1.5 text-[10px] text-[#B8A99A] hover:text-[#F5F0E8] transition-colors"
+                      title={t("chat.speed")}
+                    >
+                      <span>{TTS_SPEEDS[ttsSpeed].label}</span>
+                    </button>
+                    
+                    {speedMenuOpen && (
+                      <div className="absolute bottom-full right-0 mb-1 bg-[#1F1B18] border border-[#3B322A] rounded shadow-lg z-10">
+                        {Object.entries(TTS_SPEEDS).map(([key, { label }]) => (
+                          <button
+                            key={key}
+                            onClick={async () => {
+                              await setTtsSpeed(key as TTSSpeed);
+                              setSpeedMenuOpen(false);
+                            }}
+                            className={`block w-full text-left px-3 py-1.5 text-[10px] ${
+                              ttsSpeed === key
+                                ? "bg-[#E86B2E]/20 text-[#F4C430]"
+                                : "text-[#B8A99A] hover:bg-[#2B241F] hover:text-[#F5F0E8]"
+                            } transition-colors`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

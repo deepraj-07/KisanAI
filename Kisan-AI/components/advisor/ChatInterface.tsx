@@ -27,8 +27,16 @@ import { logActivity } from "@/core/firebase/activity-log";
 import { useAuth } from "@/core/firebase/auth-context";
 import { getUserProfile } from "@/core/firebase/user-profile";
 import { useLocation } from "@/hooks/useLocation";
-import { LANGUAGE_OPTIONS } from "@/app/(dashboard)/advisor/types";
 import type { FirestoreUser } from "@/core/data/firestore-schema";
+
+const LANGUAGE_OPTIONS: Array<{ code: LanguageCode; label: string }> = [
+  { code: "en", label: "English" },
+  { code: "hi", label: "हिंदी" },
+  { code: "pa", label: "ਪੰਜਾਬੀ" },
+  { code: "mr", label: "मराठी" },
+  { code: "te", label: "తెలుగు" },
+  { code: "ta", label: "தமிழ்" },
+];
 
 type AdviceApiResponse = {
   success: boolean;
@@ -74,7 +82,7 @@ async function buildRealtimeContext(
       const w = weatherData.data;
       const rainTomorrow = w.forecast?.[1]?.precipitationChance ?? 0;
       parts.push(`LIVE WEATHER (${locationLabel}):
-    - Temperature: ${w.temperature}\u00B0C (feels like ${w.feelsLike}\u00B0C)
+    - Temperature: ${w.temperature}°C (feels like ${w.feelsLike}°C)
 - Condition: ${w.condition}
 - Humidity: ${w.humidity}%
 - Wind: ${w.windSpeed} km/h
@@ -83,7 +91,7 @@ async function buildRealtimeContext(
 - Rain tomorrow: ${rainTomorrow}% probability
 - Evapotranspiration: ${w.evapotranspiration} mm/day
 - UV Index: ${w.uvIndex}
-    - 7-day forecast: ${(w.forecast || []).slice(0,3).map((d: {dayName:string;high:number;low:number;precipitationChance:number}) => `${d.dayName} ${d.high}\u00B0/${d.low}\u00B0 ${d.precipitationChance}% rain`).join(", ")}`);
+    - 7-day forecast: ${(w.forecast || []).slice(0,3).map((d: {dayName:string;high:number;low:number;precipitationChance:number}) => `${d.dayName} ${d.high}°/${d.low}° ${d.precipitationChance}% rain`).join(", ")}`);
     }
   } catch { /* non-critical */ }
 
@@ -110,10 +118,10 @@ async function buildRealtimeContext(
 // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Empty state Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 const SUGGESTIONS = [
-  "\u092E\u0947\u0930\u0940 \u092B\u0938\u0932 \u092E\u0947\u0902 \u0915\u094D\u092F\u093E \u0930\u094B\u0917 \u0939\u0948?",
-  "\u0906\u091C \u092E\u0902\u0921\u0940 \u092D\u093E\u0935 \u0915\u094D\u092F\u093E \u0939\u0948?",
-  "\u0938\u093F\u0902\u091A\u093E\u0908 \u0915\u092C \u0915\u0930\u0942\u0902?",
-  "\u0915\u094C\u0928 \u0938\u0940 \u0916\u093E\u0926 \u0921\u093E\u0932\u0942\u0902?",
+  "मेरी फसल में क्या रोग है?",
+  "आज मंडी भाव क्या है?",
+  "सिंचाई कब करूँ?",
+  "कौन सी खाद डालूँ?",
   "Best crop for my soil?",
   "PM-KISAN status check",
 ];
@@ -391,7 +399,7 @@ export default function ChatInterface() {
             <EmptyState onSuggest={handleSuggest} />
           ) : (
             messages.map((message: ChatMessage) => (
-              <MessageBubble key={message.id} message={message} language={language} />
+              <MessageBubble key={message.id} message={message} />
             ))
           )}
           <div ref={messagesEndRef} />
